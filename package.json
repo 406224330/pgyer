@@ -2,6 +2,7 @@
   "name": "p2",
   "version": "0.1.0",
   "private": true,
+  "description": "pgyer project@ccn@1.0.0",
   "dependencies": {
     "antd": "^3.6.5",
     "autoprefixer": "7.1.6",
@@ -81,7 +82,7 @@
     "start-pro-debug": "concurrently \"npm run start-client\"",
     "start-pro": "concurrently \"npm run start-client\"  \"npm run start-api\""
   },
-  "homepage": ".",
+  "homepage": "http://source.yesno.com.cn/pgyer/",
   "proxy": "http://127.0.0.1:8686",
   "devDependencies": {
     "babel-plugin-transform-remove-strict-mode": "0.0.2"

@@ -6,28 +6,13 @@ import {
     Link,
     Redirect 
 } from 'react-router-dom';
-
 import axios from 'axios';
-
-import { Modal,Spin,Alert } from 'antd';
-
 import './css/index.css';
-
-import config from '../../config';
-
 import {observer, inject} from 'mobx-react';
-
-import DevTools from 'mobx-react-devtools';
-
-/**
- * 
- * 设置雪花背景基础配置
- * **/
+import {Icon} from 'antd';
 import particlesJS from '../../lib/js/particles.js';
 import backJson from '../../lib/js/background.json';
-
-const success=Modal.success;
-
+import OpenNotice from '../../lib/common';
 
 
 @inject(['loginStore'])  
@@ -37,6 +22,7 @@ class login extends Component {
     constructor(props){
         super(props);
         console.log(this)
+
     }
 
     componentDidMount(){
@@ -45,7 +31,6 @@ class login extends Component {
         console.log(this)
     }
 
-    
     changeUsername = (e) => {
         this.props.loginStore.changeUsername(e.target.value)
     }
@@ -58,9 +43,35 @@ class login extends Component {
         this.props.loginStore.changeImgcode(e.target.value)
     }
 
-
     login(){
         let _this=this;
+
+        const icon=<Icon type="smile-circle" style={{ color: '#108ee9' }} />;
+        if(!_this.refs.username.value){
+    
+            OpenNotice.openNotification({
+                msg:"请输入用户名",
+                icon:icon
+            })
+            return;
+        }
+
+        if(!_this.refs.pwd.value){
+            OpenNotice.openNotification({
+                msg:"请输入密码",
+                icon:icon
+            })
+            return;
+        }
+
+
+        if(!_this.refs.verify.value){
+            OpenNotice.openNotification({
+                msg:"请输入图片验证码",
+                icon:icon
+            })
+            return;
+        }
 
         let isLock=false;
         if(!isLock){
@@ -68,22 +79,32 @@ class login extends Component {
                 loading:true
             })
             isLock=true;
-            var data={username:this.props.loginStore.username,pwd:this.props.loginStore.password,imgcode:this.props.loginStore.imgcode};//e10adc3949ba59abbe56e057f20f883e
+            var data={
+                username:this.props.loginStore.username,
+                pwd:this.props.loginStore.password,
+                imgcode:this.props.loginStore.imgcode
+            };
             axios.post('/api/user/login',data).then(function(pdata){
+                debugger;
                 if(pdata.data=='1'){
                     isLock=false;
-                    success({
-                        title: '登录成功！',
-                        content: "测试 调取/api/user/login接口:"+pdata.data,
-                        onOk() {
-                        return new Promise((resolve, reject) => {
-                                
-                                window.location.href='/';
-
-                        }).catch(() => console.log('Oops errors!'));
+                    OpenNotice.openSuccessNotifi({
+                        title:"登录成功！",
+                        content:"测试 调取/api/user/login接口:"+pdata.data,
+                        okFn:function(resolve, reject){
+                            window.location.href='/';
                         }
                     })
                     return;
+                }else if(pdata.data.code=="002"){
+
+                    OpenNotice.openNotification({
+                        msg:'验证码错误',
+                        icon:icon
+                    });
+
+                    _this.changeValidCode();
+                    
                 }
             }).catch(function(error){
                 console.log(error);
@@ -93,18 +114,18 @@ class login extends Component {
     }
 
     changeValidCode(e){
+        this.props.loginStore.changeImgcode('');
         this.refs.imgcode.src=this.refs.imgcode.src+'?rnd='+Math.random();
     }
 
     render(){
-
         return (
             <div>
                 <div id="box"></div>
                 <div className="cent-box">
          
                     <div className="cent-box-header">
-                        <h1 className="main-title"></h1>
+                        <h1 className="main-title"> </h1>
                         <h2 className="sub-title">蒲公英一物一码营销管理平台</h2>
                     </div>
                 
@@ -116,23 +137,23 @@ class login extends Component {
                                 <div className="slide-bar"></div>				
                             </div>
                         </div>
-            
-                    <div className="login form">
-                        
-                        <div className="group">
-                            <div className="group-ipt email">
-                                <input type="text" name="email" id="email"  onChange={ this.changeUsername.bind(this) } className="ipt" placeholder="邮箱地址" required/>
+    
+                        <div className="login form">
+                            
+                            <div className="group">
+                                <div className="group-ipt email">
+                                    <input type="text" name="email" id="email" ref="username" value={this.props.loginStore.username}  onChange={ this.changeUsername.bind(this) } className="ipt" placeholder="输入您的用户名" required/>
+                                </div>
+                                <div className="group-ipt password">
+                                    <input type="password" name="password"  ref="pwd" id="password" onChange={ this.changePassword.bind(this) } className="ipt" placeholder="输入您的登录密码" required/>
+                                </div>
+                                <div className="group-ipt verify">
+                                    <input type="text" name="verify"  ref="verify" value={this.props.loginStore.imgcode} id="verify" onChange={this.changeImgcode.bind(this)} className="ipt" placeholder="输入验证码" required/>
+                                    <img src="/api/validcode/getcode" onClick={this.changeValidCode.bind(this)} ref="imgcode" alt="看不清，点击更换" className="imgcode"/>
+                                </div>
                             </div>
-                            <div className="group-ipt password">
-                                <input type="password" name="password" id="password" onChange={ this.changePassword.bind(this) } className="ipt" placeholder="输入您的登录密码" required/>
-                            </div>
-                            <div className="group-ipt verify">
-                                <input type="text" name="verify" id="verify" onChange={this.changeImgcode.bind(this)} className="ipt" placeholder="输入验证码" required/>
-                                <img src="/api/validcode/getcode" onClick={this.changeValidCode.bind(this)} ref="imgcode" alt="看不清，点击更换" className="imgcode"/>
-                            </div>
+                            
                         </div>
-                        
-                    </div>
 
 
                     <div className="button">
@@ -158,6 +179,5 @@ class login extends Component {
         )
     }
 }
-
 
 export default login;

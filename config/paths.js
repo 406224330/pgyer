@@ -32,10 +32,16 @@ const getPublicUrl = appPackageJson =>
 // We can't use a relative path in HTML because we don't want to load something
 // like /todos/42/static/js/bundle.7289d.js. We have to know the root.
 function getServedPath(appPackageJson) {
+
   const publicUrl = getPublicUrl(appPackageJson);
   const servedUrl =
-    envPublicUrl || (publicUrl ? url.parse(publicUrl).pathname : '/');
-  return ensureSlash(servedUrl, true);
+    envPublicUrl || (publicUrl ? url.parse(publicUrl).href : '/');
+  
+    //更新代码 可以支持 远程CDN节点
+  // const servedUrl =
+  //   envPublicUrl || (publicUrl ? url.parse(publicUrl).pathname : '/');
+    
+    return ensureSlash(servedUrl, true);
 }
 
 // config after eject: we're in ./config/

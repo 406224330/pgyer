@@ -18,9 +18,9 @@ var RedisStore = require('connect-redis')(session);
 const port = config.apiPort;
 
 const options={
-    host:'10.20.31.11',
-    port:'6379',
-    db:10
+    host:config.redis.host,
+    port:config.redis.port,
+    db:config.redis.db
 }
 
 app.use(bodyParser.json()); // for parsing application/json

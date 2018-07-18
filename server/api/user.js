@@ -31,7 +31,7 @@ router.post('/login',function(req,res){
     ///校验验证码
     console.log(captcha);
     if(imgcode!==captcha || imgcode==null || captcha==null){
-        res.send(403,{"result":"invalid imgcode"}); 
+        res.send({"result":"invalid imgcode","code":"002"}); 
         return;
     }
     
@@ -44,7 +44,7 @@ router.post('/login',function(req,res){
         };
         res.send(result); 
     }else{
-        res.send(403,{"result":"invalid username or pwd"}); 
+        res.send({"result":"invalid username or pwd","code":"003"}); 
         return;
     }
 
